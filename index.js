@@ -1,3 +1,4 @@
+var log = require("./Load_discord.js");
 // Require the necessary discord.js classes
 const {
   Client,
@@ -27,14 +28,7 @@ client.once(Events.ClientReady, (c) => {
     server.channels.fetch().then((channel) => {
       channel.forEach((billy) => {
         if (billy.type == "0") {
-          billy.messages.fetch().then((messages) => {
-            messages.forEach((message) => {
-              console.log(message.content);
-			  message.reactions.cache.forEach(reaction =>{
-				console.log(reaction.users);
-			  });
-            });
-          });
+          log.Load_Messages(billy);
         }
       });
     });
