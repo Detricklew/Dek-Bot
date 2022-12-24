@@ -29,7 +29,10 @@ client.once(Events.ClientReady, (c) => {
         if (billy.type == "0") {
           billy.messages.fetch().then((messages) => {
             messages.forEach((message) => {
-              console.log(message.content + );
+              console.log(message.content);
+			  message.reactions.cache.forEach(reaction =>{
+				console.log(reaction.users);
+			  });
             });
           });
         }
