@@ -1,4 +1,6 @@
 var log = require("./Load_discord.js");
+const { token } = require("./config.json");
+const { Load_DB } = require("./Load_discord.js");
 // Require the necessary discord.js classes
 const {
   Client,
@@ -7,8 +9,7 @@ const {
   SlashCommandStringOption,
   Guild,
 } = require("discord.js");
-const { token } = require("./config.json");
-
+Load_DB(); 
 // Create a new client instance
 const client = new Client({
   intents: [
@@ -50,11 +51,7 @@ client.once(Events.ClientReady, (c) => {
 });
 
 client.on("messageCreate", async (message) => {
-  console.log(message.author.username);
-  console.log(message.channel);
-  console.log(message.createdAt);
-  console.log(message.channel.name);
-  console.log(message.content);
+        log.Log_message(message);
 });
 
 client.on("messageReactionAdd", async (MessageReaction, user) => {
