@@ -106,7 +106,126 @@ function Log_messages(message) {
   );
 }
 var log = {
-  
+  load_users: async function (server){
+      server.members
+      .fetch()
+      .then(member =>{
+        member.forEach(member =>{
+          const id = member.user.id;
+          const username = member.user.username;
+          let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+            if (err) {
+              return console.log(err);
+            }
+          });
+          db.get(
+            `SELECT EXISTS(
+              SELECT * FROM user
+              WHERE id = ?
+              AND Username = ?)`,
+              [id, username],
+              (err,row) =>{
+                if(err){
+                  console.error(err);
+                  return;
+                }
+                let check = Object.values(row);
+                if(check == "1"){
+                  return;
+                }
+                else{
+                  db.get(
+                    `SELECT EXISTS(
+                      SELECT * FROM user
+                      WHERE id = ?)`,
+                      [id], (err,rows) =>{
+                        if(err){
+                          console.error(err);
+                        }
+                        let checks = Object.values(rows);
+                        if (checks == "1"){
+                          db.run(
+                            `UPDATE user
+                            SET Username = ?
+                            WHERE id = ?`,
+                            [username, id], (err) =>{
+                              if (err){
+                                console.error(err);
+                                return;
+                              }
+                              return;
+                            }
+                          )
+                        }
+                        else{
+                          db.run(
+                            `INSERT INTO user(
+                              id,
+                              Username)
+                              VALUES (?,?)`,
+                              [id, username], err =>{
+                                if(err){
+                                  console.error(err);
+                                  return;
+                                }
+                                return;
+                              }
+                          )
+                        }
+                      }
+                  )
+                }
+              }
+          )
+        })
+      })
+  },
+  Log_Reaction: async function (user_id, messagereaction){
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.log(err);
+      }
+    });
+    const messages_id = messagereaction.message.id;
+    const reaction = messagereaction.emoji.name;
+    db.get(
+      `SELECT EXISTS
+      (SELECT * FROM reaction
+        WHERE user_id = ?
+        AND messages_id = ?
+        AND reaction = ?)`,
+        [user_id, messages_id, reaction],
+        (err,rows) =>{
+          if (err){
+            console.error(err);
+            return;
+          }
+          let check = Object.values(rows);
+          if (check == "1"){
+            return;
+          }
+          else{
+            db.run(
+              `INSERT INTO reaction (
+                user_id,
+                messages_id,
+                reaction
+              )
+              VALUES(?, ?, ?)`,
+              [user_id, messages_id, reaction],
+              err =>{
+                if (err){
+                  console.error(err);
+                  return;
+                }
+                return;
+              }
+            )
+          }
+
+        }
+    )
+  },
   Load_Server:  async function (server){
     const guild_id = server.id;
     const guild_name = server.name;
