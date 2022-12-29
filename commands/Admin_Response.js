@@ -252,7 +252,7 @@ module.exports = {
            user.Username FROM
            custom_responses
            JOIN user 
-           ON custom_responses.user_id = user.id;
+           ON custom_responses.user_id = user.id
            WHERE guild_id = ?`,
           [guild_id],
           (err, rows) => {
