@@ -1,59 +1,65 @@
 let sqlite3 = require("sqlite3").verbose();
+function getRandomInt(min, max) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+}
 
-async function Load_reactions(message, reactions){
+
+
+async function Load_reactions(message, reactions) {
   let db = new sqlite3.Database("./Dek-bot.db", (err) => {
     if (err) {
-      return console.log(err);
+      return console.error(err);
     }
   });
-  reactions.cache.forEach( reaction =>{
+  reactions.cache.forEach((reaction) => {
     var emoji = reaction.emoji.name;
-    reaction.users
-    .fetch()
-    .then(user =>{
-      user.forEach(user =>{
+    reaction.users.fetch().then((user) => {
+      user.forEach((user) => {
         db.get(
           `SELECT EXISTS
           (SELECT * FROM reaction
             WHERE user_id = ?
             AND messages_id = ?
             AND reaction = ?)`,
-            [user.id, message, emoji],
-            (err,rows) =>{
-              if (err){
-                console.error(err);
-                return;
-              }
-              let check = Object.values(rows);
-              if (check == "1"){
-                return;
-              }
-              else{
-                db.run(
-                  `INSERT INTO reaction (
+          [user.id, message, emoji],
+          (err, rows) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            let check = Object.values(rows);
+            if (check == "1") {
+              return;
+            } else {
+              db.run(
+                `INSERT INTO reaction (
                     user_id,
                     messages_id,
                     reaction
                   )
                   VALUES(?, ?, ?)`,
-                  [user.id, message, emoji],
-                  err =>{
-                    if (err){
-                      console.error(err);
-                      return;
-                    }
+                [user.id, message, emoji],
+                (err) => {
+                  if (err) {
+                    console.error(err);
                     return;
                   }
-                )
-              }
-
+                  return;
+                }
+              );
             }
-        )
-      })
-    })
-  })
+          }
+        );
+      });
+    });
+  });
 }
 function Log_messages(message) {
+  if (message.author.bot){
+    return;
+  }
   const Channel_id = message.channelId;
   const User_id = message.author.id;
   const Message = message.content;
@@ -62,18 +68,14 @@ function Log_messages(message) {
   const time = message.createdTimestamp;
   let db = new sqlite3.Database("./Dek-bot.db", (err) => {
     if (err) {
-      return console.log(err);
+      return console.error(err);
     }
   });
   db.get(
     `SELECT EXISTS
       (SELECT * FROM message
-       WHERE user_id = ?
-       AND channel_id = ?
-       AND guild_id = ?
-       AND id = ?
-       AND timestamp = ?)`,
-    [User_id, Channel_id, Guild_id, Message_id, time],
+       WHERE id = ?)`,
+    [Message_id],
     (err, row) => {
       if (err) {
         return console.error(err);
@@ -105,85 +107,281 @@ function Log_messages(message) {
     }
   );
 }
+
 var log = {
-  load_users: async function (server){
-      server.members
-      .fetch()
-      .then(member =>{
-        member.forEach(member =>{
-          const id = member.user.id;
-          const username = member.user.username;
-          let db = new sqlite3.Database("./Dek-bot.db", (err) => {
-            if (err) {
-              return console.log(err);
+  Delete_message: async function (message) {
+    const Channel_id = message.channelId;
+    const User_id = message.author.id;
+    const Message = message.content;
+    const Guild_id = message.guildId;
+    const Message_id = message.id;
+    const time = message.createdTimestamp;
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+    db.get(
+      `SELECT EXISTS (SELECT
+        * FROM message 
+        WHERE id = ?)`,
+      [Message_id],
+      (err, row) => {
+        if (err) {
+          return console.error(err);
+        }
+        let checks = Object.values(row);
+        if (checks == "1") {
+          db.run(
+            `DELETE FROM message 
+              WHERE id = ?`,
+            [Message_id],
+            (err) => {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              return;
             }
-          });
+          );
+        } else {
+          return;
+        }
+      }
+    );
+  },
+  log_channel: async function (channel) {
+    const id = channel.id;
+    const guild_id = channel.guildId;
+    const name = channel.name;
+    const type = channel.type;
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+    db.get(
+      `SELECT EXISTS(
+        SELECT * FROM channels
+        WHERE id = ?
+        AND guild_id = ?
+        AND name = ?
+        AND type = ?)`,
+      [id, guild_id, name, type],
+      (err, row) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        let check = Object.values(row);
+        if (check == "1") {
+          return;
+        } else {
           db.get(
             `SELECT EXISTS(
+                SELECT * FROM channels
+                WHERE id = ?
+                AND guild_id = ?
+                AND type = ?)`,
+            [id, guild_id, type],
+            (err, rows) => {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              let checks = Object.values(rows);
+              if (checks == "1") {
+                db.run(
+                  `UPDATE channels
+                      SET name = ?
+                      WHERE id = ?
+                      AND guild_id = ?
+                      AND type = ?`,
+                  [name, id, guild_id, type],
+                  (err) => {
+                    if (err) {
+                      console.error(err);
+                      return;
+                    }
+                    return;
+                  }
+                );
+              } else {
+                db.run(
+                  `INSERT INTO channels(
+                        id,
+                        guild_id,
+                        name,
+                        type)
+                        VALUES (?,?,?,?)`,
+                  [id, guild_id, name, type],
+                  (err) => {
+                    if (err) {
+                      console.error(err);
+                      return;
+                    }
+                    return;
+                  }
+                );
+              }
+            }
+          );
+        }
+      }
+    );
+  },
+  log_user: async function (GuildMember) {
+    if (GuildMember.user.bot) {
+      return;
+    }
+    const id = GuildMember.user.id;
+    const username = GuildMember.user.username;
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+    db.get(
+      `SELECT EXISTS(
+        SELECT * FROM user
+        WHERE id = ?
+        AND Username = ?)`,
+      [id, username],
+      (err, row) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        let check = Object.values(row);
+        if (check == "1") {
+          return;
+        } else {
+          db.get(
+            `SELECT EXISTS(
+                SELECT * FROM user
+                WHERE id = ?)`,
+            [id],
+            (err, rows) => {
+              if (err) {
+                console.error(err);
+              }
+              let checks = Object.values(rows);
+              if (checks == "1") {
+                db.run(
+                  `UPDATE user
+                      SET Username = ?
+                      WHERE id = ?`,
+                  [username, id],
+                  (err) => {
+                    if (err) {
+                      console.error(err);
+                      return;
+                    }
+                    return;
+                  }
+                );
+              } else {
+                db.run(
+                  `INSERT INTO user(
+                        id,
+                        Username)
+                        VALUES (?,?)`,
+                  [id, username],
+                  (err) => {
+                    if (err) {
+                      console.error(err);
+                      return;
+                    }
+                    return;
+                  }
+                );
+              }
+            }
+          );
+        }
+      }
+    );
+  },
+  load_users: async function (server) {
+    server.members.fetch().then((member) => {
+      member.forEach((member) => {
+        if (member.user.bot) {
+          return;
+        }
+        const id = member.user.id;
+        const username = member.user.username;
+        let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+          if (err) {
+            return console.error(err);
+          }
+        });
+        db.get(
+          `SELECT EXISTS(
               SELECT * FROM user
               WHERE id = ?
               AND Username = ?)`,
-              [id, username],
-              (err,row) =>{
-                if(err){
-                  console.error(err);
-                  return;
-                }
-                let check = Object.values(row);
-                if(check == "1"){
-                  return;
-                }
-                else{
-                  db.get(
-                    `SELECT EXISTS(
+          [id, username],
+          (err, row) => {
+            if (err) {
+              console.error(err);
+              return;
+            }
+            let check = Object.values(row);
+            if (check == "1") {
+              return;
+            } else {
+              db.get(
+                `SELECT EXISTS(
                       SELECT * FROM user
                       WHERE id = ?)`,
-                      [id], (err,rows) =>{
-                        if(err){
-                          console.error(err);
-                        }
-                        let checks = Object.values(rows);
-                        if (checks == "1"){
-                          db.run(
-                            `UPDATE user
+                [id],
+                (err, rows) => {
+                  if (err) {
+                    console.error(err);
+                  }
+                  let checks = Object.values(rows);
+                  if (checks == "1") {
+                    db.run(
+                      `UPDATE user
                             SET Username = ?
                             WHERE id = ?`,
-                            [username, id], (err) =>{
-                              if (err){
-                                console.error(err);
-                                return;
-                              }
-                              return;
-                            }
-                          )
+                      [username, id],
+                      (err) => {
+                        if (err) {
+                          console.error(err);
+                          return;
                         }
-                        else{
-                          db.run(
-                            `INSERT INTO user(
+                        return;
+                      }
+                    );
+                  } else {
+                    db.run(
+                      `INSERT INTO user(
                               id,
                               Username)
                               VALUES (?,?)`,
-                              [id, username], err =>{
-                                if(err){
-                                  console.error(err);
-                                  return;
-                                }
-                                return;
-                              }
-                          )
+                      [id, username],
+                      (err) => {
+                        if (err) {
+                          console.error(err);
+                          return;
                         }
+                        return;
                       }
-                  )
+                    );
+                  }
                 }
-              }
-          )
-        })
-      })
+              );
+            }
+          }
+        );
+      });
+    });
   },
-  Log_Reaction: async function (user_id, messagereaction){
+  Log_Reaction: async function (user_id, messagereaction) {
     let db = new sqlite3.Database("./Dek-bot.db", (err) => {
       if (err) {
-        return console.log(err);
+        return console.error(err);
       }
     });
     const messages_id = messagereaction.message.id;
@@ -194,44 +392,42 @@ var log = {
         WHERE user_id = ?
         AND messages_id = ?
         AND reaction = ?)`,
-        [user_id, messages_id, reaction],
-        (err,rows) =>{
-          if (err){
-            console.error(err);
-            return;
-          }
-          let check = Object.values(rows);
-          if (check == "1"){
-            return;
-          }
-          else{
-            db.run(
-              `INSERT INTO reaction (
+      [user_id, messages_id, reaction],
+      (err, rows) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        let check = Object.values(rows);
+        if (check == "1") {
+          return;
+        } else {
+          db.run(
+            `INSERT INTO reaction (
                 user_id,
                 messages_id,
                 reaction
               )
               VALUES(?, ?, ?)`,
-              [user_id, messages_id, reaction],
-              err =>{
-                if (err){
-                  console.error(err);
-                  return;
-                }
+            [user_id, messages_id, reaction],
+            (err) => {
+              if (err) {
+                console.error(err);
                 return;
               }
-            )
-          }
-
+              return;
+            }
+          );
         }
-    )
+      }
+    );
   },
-  Load_Server:  async function (server){
+  Load_Server: async function (server) {
     const guild_id = server.id;
     const guild_name = server.name;
     let db = new sqlite3.Database("./Dek-bot.db", (err) => {
       if (err) {
-        return console.log(err);
+        return console.error(err);
       }
     });
     db.get(
@@ -240,69 +436,68 @@ var log = {
         WHERE id = ?
         AND name  = ?
         )`,
-        [guild_id, guild_name], (err,row) =>{
-          if(err){
-            console.error(err);
-          }
-          let checks = Object.values(row);
-          console.log("Checks1");
-          console.log(checks);
-          if(checks == "1"){
-            return;
-          }
-          else{
-            console.log("if passed");
-            db.get(
-              `SELECT EXISTS(
+      [guild_id, guild_name],
+      (err, row) => {
+        if (err) {
+          console.error(err);
+        }
+        let checks = Object.values(row);
+        if (checks == "1") {
+          return;
+        } else {
+          db.get(
+            `SELECT EXISTS(
                 SELECT * FROM guilds
                 WHERE id = ?
-                )`,[guild_id], (err1,row1) =>{
-                  if (err){
-                    console.error(err1);
-                    return;
-                  }
-                  else{
-                  let check = Object.values(row1);
-                  console.log("checks2");
-                  console.log(check);
-                  if (check == "1"){
-                    db.run(
+                )`,
+            [guild_id],
+            (err1, row1) => {
+              if (err) {
+                console.error(err1);
+                return;
+              } else {
+                let check = Object.values(row1);
+                if (check == "1") {
+                  db.run(
                     `UPDATE guilds
                      SET name = ?
                      WHERE id = ?
-                      `, [guild_name, guild_id], (err) =>{
-                        if (err){
-                          console.error(err);
-                          return;
-                        }
-                        return;
-                      }
-                    )
-                  }
-                  else{
-                    db.run(
-                    `INSERT INTO 
-                     guilds (id, name)
-                     VALUES (?,?)`,
-                     [guild_id, guild_name], (err) =>{
-                      if (err){
+                      `,
+                    [guild_name, guild_id],
+                    (err) => {
+                      if (err) {
                         console.error(err);
                         return;
                       }
                       return;
-                     }
-                    )
-                  }
-                  }
-                })
-          }
+                    }
+                  );
+                } else {
+                  db.run(
+                    `INSERT INTO 
+                     guilds (id, name)
+                     VALUES (?,?)`,
+                    [guild_id, guild_name],
+                    (err) => {
+                      if (err) {
+                        console.error(err);
+                        return;
+                      }
+                      return;
+                    }
+                  );
+                }
+              }
+            }
+          );
         }
-    )
+      }
+    );
   },
   Load_DB: function () {
     let db = new sqlite3.Database("./Dek-bot.db", (err) => {
       if (err) {
-        return console.log(err);
+        return console.error(err);
       } else {
         db.run(`CREATE TABLE IF NOT EXISTS "user" (
                     "id"	INTEGER NOT NULL UNIQUE,
@@ -334,12 +529,16 @@ var log = {
                       PRIMARY KEY("id")
                     )`);
         db.run(`CREATE TABLE IF NOT EXISTS "custom_responses" (
+                      "id"	INTEGER NOT NULL,
+                      "name" TEXT NOT NULL,
                       "user_id"	INTEGER NOT NULL,
                       "trigger"	TEXT NOT NULL,
                       "response"	TEXT NOT NULL,
                       "guild_id"	INTEGER NOT NULL,
                       "channel_exclusive"	INTEGER NOT NULL,
-                      "channel_id"	INTEGER NOT NULL,
+                      "channel_id"	INTEGER,
+                      "primary_response" INTEGER NOT NULL,
+                      PRIMARY KEY("id" AUTOINCREMENT),
                       FOREIGN KEY("channel_id") REFERENCES "channels"("id"),
                       FOREIGN KEY("user_id") REFERENCES "user"("id"),
                       FOREIGN KEY("guild_id") REFERENCES "guilds"("id")
@@ -348,6 +547,7 @@ var log = {
                       "id"	INTEGER NOT NULL,
                       "guild_id"	INTEGER NOT NULL,
                       "name"	TEXT NOT NULL,
+                      "type"  INTEGER NOT NULL,
                       PRIMARY KEY("id")
                     )`);
         console.log("Successfully loaded database 'Dek-bot'");
@@ -356,6 +556,9 @@ var log = {
     });
   },
   Log_message: async function (message) {
+    if(message.author.bot){
+      return;
+    }
     const Channel_id = message.channelId;
     const User_id = message.author.id;
     const Message = message.content;
@@ -364,17 +567,18 @@ var log = {
     const time = message.createdTimestamp;
     let db = new sqlite3.Database("./Dek-bot.db", (err) => {
       if (err) {
-        return console.log(err);
+        return console.error(err);
       }
     });
     db.get(
       `SELECT EXISTS (SELECT
         * FROM message WHERE user_id = ?
+         AND content = ?
          AND channel_id = ?
          AND guild_id = ?
          AND id = ?
          AND timestamp = ?)`,
-      [User_id, Channel_id, Guild_id, Message_id, time],
+      [User_id, Message, Channel_id, Guild_id, Message_id, time],
       (err, row) => {
         if (err) {
           return console.error(err);
@@ -383,23 +587,53 @@ var log = {
         if (checks == "1") {
           return;
         } else {
-          db.run(
-            `INSERT INTO message (
-              user_id,
-              content,
-              guild_id,
-              channel_id,
-              timestamp,
-              id
-            )
-            VALUES(?,?,?,?,?,?)`,
-            [User_id, Message, Guild_id, Channel_id, time, Message_id],
-            (err) => {
-              if (err) {
-                console.log(err);
+          db.get(
+            `SELECT EXISTS(
+              SELECT * FROM message
+               WHERE id = ?)`,
+            [Message_id],
+            (err1, row1) => {
+              if (err1) {
+                console.error(err1);
                 return;
+              } else {
+                let check = Object.values(row1);
+                if (check == "1") {
+                  db.run(
+                    `UPDATE message
+                      SET content = ?
+                      WHERE id = ?`,
+                    [Message, Message_id],
+                    (err) => {
+                      if (err) {
+                        console.error(err);
+                        return;
+                      }
+                      return;
+                    }
+                  );
+                }
+                else{
+                  db.run(
+                    `INSERT INTO message(
+                      user_id,
+                      content,
+                      guild_id,
+                      channel_id,
+                      id,
+                      timestamp)
+                      VALUES (?,?,?,?,?,?)`,
+                      [User_id, Message, Channel_id, Guild_id, Message_id, time],
+                      (err) =>{
+                        if (err){
+                          console.error(err);
+                          return;
+                        }
+                        return;
+                      }
+                  )
+                }
               }
-              return;
             }
           );
         }
@@ -426,7 +660,7 @@ var log = {
           message =
             0 < messagePage.size ? messagePage.at(messagePage.size - 1) : null;
         });
-    };
+    }
 
     messages.forEach((message) => {
       Log_messages(message);
@@ -434,5 +668,154 @@ var log = {
     });
     // Print all messages
   },
+  Delete_reaction: async function (message) {
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+    db.get(
+      `SELECT EXISTS
+      (SELECT * FROM reaction
+        WHERE messages_id = ?)`,
+      [message],
+      (err, rows) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        let check = Object.values(rows);
+        if (check == "1") {
+          db.run(
+            `DELETE FROM reaction
+            WHERE messages_id = ?`,
+            [message],
+            (err) => {
+              if (err) {
+                console.error(err);
+                return;
+              }
+              return;
+            }
+          );
+        } else {
+          return;
+        }
+      }
+    );
+  },
+  delete_channel: async function (channel) { 
+    const id = channel.id;
+    const guild_id = channel.guildId;
+    const name = channel.name;
+    const type = channel.type;
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+    db.get(
+      `SELECT EXISTS(
+        SELECT * FROM channels
+        WHERE id = ?
+        AND guild_id = ?
+        AND name = ?
+        AND type = ?)`,
+      [id, guild_id, name, type],
+      (err, row) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        let check = Object.values(row);
+        if (check == "1") {
+          db.run(
+            `DELETE FROM channels
+            WHERE id = ?
+            AND guild_id = ?
+            AND name = ?
+            AND type = ?`,
+            [id, guild_id, name, type],
+            (err) =>{
+              if(err){
+                console.error(err);
+                return;
+              }
+              return;
+            }
+          )
+        } else {
+            return;
+        }
+      }
+    );
+  },
+  check_responses: async function (message){
+    var primary = 0;
+    if (message.member.user.bot){
+      return;
+    }
+    const responses = [];
+    guild_id = message.guildId;
+    content = message.content.toLowerCase();
+    channel_id = message.channelId;
+    let db = new sqlite3.Database("./Dek-bot.db", (err) => {
+      if (err) {
+        return console.error(err);
+      }
+    });
+    db.get(
+      `SELECT EXISTS(
+        SELECT * FROM custom_responses
+        WHERE guild_id = ?)`,
+        [guild_id],
+        (err,row) =>{
+          if(err){
+            console.error(err);
+            return;
+          }
+          const check = Object.values(row);
+          if(check == "1"){
+            db.all(
+              `SELECT  name,
+              trigger,
+              response,
+              channel_id,
+              primary_response
+              FROM custom_responses
+              WHERE guild_id = ?`,
+              [guild_id], 
+              (err,rows) =>{
+                if(err){
+                  console.error(err);
+                  return;
+                }
+                rows.forEach(row =>{
+                  if (row.channel_id == channel_id || !row.channel_id){
+                    if(content.includes(row.trigger)){
+                      if (row.primary_response == "1"){
+                        message.channel.send(row.response);
+                        primary = 1;
+                        return;
+                      }
+                      else{
+                        responses.push(row.response);
+                      }
+                    }
+                  }
+                })
+                if(responses.length == "0" || primary == "1"){
+                  return;
+                }
+                const i = getRandomInt(0,responses.length);
+                message.channel.send(responses.at(i));
+                return;
+              }
+            )
+          }
+          return;
+        }
+    )
+  }
 };
 module.exports = log;
