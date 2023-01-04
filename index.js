@@ -1,3 +1,6 @@
+function WordCount(str) { 
+  return str.split(" ").length;
+}
 const fs = require('node:fs');
 const path = require('node:path');
 var log = require("./Load_discord.js");
@@ -80,7 +83,6 @@ client.once(Events.ClientReady, (c) => {
               })
             })
           })
-          log.Load_Messages(channel);
         }
       });
     });
@@ -127,6 +129,7 @@ client.on("channelUpdate", (channel, channel1) =>{
 client.on("guildMemberAdd", async (GuildMember) =>{
   log_user(GuildMember);
 });
+
 
 client.on(Events.InteractionCreate, async interaction => {
 	if (!interaction.isChatInputCommand()) return;
