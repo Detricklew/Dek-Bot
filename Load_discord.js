@@ -1,3 +1,6 @@
+function WordCount(str) { 
+  return str.split(" ").length;
+}
 let sqlite3 = require("sqlite3").verbose();
 function getRandomInt(min, max) {
   min = Math.ceil(min);
@@ -757,7 +760,8 @@ var log = {
     }
     const responses = [];
     guild_id = message.guildId;
-    content = message.content.toLowerCase();
+    content = message.content.replace(/ +/g, " ").toLowerCase();
+    const message_array = content.split(" ");
     channel_id = message.channelId;
     let db = new sqlite3.Database("./Dek-bot.db", (err) => {
       if (err) {
@@ -792,14 +796,24 @@ var log = {
                 }
                 rows.forEach(row =>{
                   if (row.channel_id == channel_id || !row.channel_id){
-                    if(content.includes(row.trigger)){
-                      if (row.primary_response == "1"){
-                        message.channel.send(row.response);
-                        primary = 1;
-                        return;
-                      }
-                      else{
-                        responses.push(row.response);
+                    if(WordCount(row.trigger) == "1"){
+                      message_array.forEach(message =>{
+                        if (message == row.trigger){
+                          responses.push(row.response);
+                          return;
+                        }
+                      })
+                    }
+                    else{
+                      if(content.includes(row.trigger) && WordCount(row.trigger) != "1"){
+                        if (row.primary_response == "1"){
+                          message.channel.send(row.response);
+                          primary = 1;
+                          return;
+                        }
+                        else{
+                          responses.push(row.response);
+                        }
                       }
                     }
                   }
