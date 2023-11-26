@@ -1,4 +1,6 @@
-node_modules
+node_modules/
 .env
 .db
+Dek-bot.db
 config.json
+.eslintrc.json
