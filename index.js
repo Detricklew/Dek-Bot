@@ -21,11 +21,14 @@ const client = new Client({
 
 // Searches the event directory and loads all events into the bot
 const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventFiles = [];
 
+// Added this so I can sort the events folders by events for better readability
+findAllFiles(eventsPath, '.js');
 
+//  Collects all files and adds them to the client event listener
 for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
+	const filePath = path.join(file.path, file.name);
 	const event = require(filePath);
 	if (event.once) {
 		client.once(event.name, (...args) => event.execute(...args));
@@ -38,3 +41,22 @@ for (const file of eventFiles) {
 // Log in to Discord with your client's token
 client.login(token);
 
+// Finds all files recursively throughout all directories in selected path
+
+function findAllFiles(currentPath, fileExtensionFilter) {
+
+	fs.readdirSync(currentPath, { withFileTypes: true }).forEach((item) => {
+
+		if (!item.isDirectory()) {
+			// If the file has the extension specified it gets added to eventFiles
+			if (item.name.endsWith(fileExtensionFilter)) eventFiles.push({ name: item.name, path: item.path });
+			return;
+		}
+		else if (item.isDirectory()) {
+			// If file is a directory recursively call function
+			findAllFiles((item.path + '/' + item.name), fileExtensionFilter);
+			return;
+		}
+		return;
+	});
+}
