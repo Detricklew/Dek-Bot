@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 const { Events } = require('discord.js');
 
 module.exports = {
@@ -5,5 +6,6 @@ module.exports = {
 	execute(message) {
 		console.log('yo');
 		console.log(message);
+        console.log(message.channelId);
 	},
 };
