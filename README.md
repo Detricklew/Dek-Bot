@@ -5,7 +5,7 @@
 This project is a bot that will have a heavy focus on providing end users with enhanced productivity. Right now it is in it's infant stages. The features this bot will contain currently are the following :
 -
 - The ability to customize resources to be easily viewable to the end user
-- The ability to send motivational quotes to users daily.
+- The ability to send motivational quotes to users daily.(WIP)
 - Promodoro timer to help users with studying
 - Currency system
 
@@ -24,7 +24,7 @@ This project is a bot that will have a heavy focus on providing end users with e
 
 ## How to tweak this Bot for your own uses
 
-Feel free to follow the installation instructions and then play around with the  code as you see fit.
+Feel free to follow the installation instructions and then play around with the code as you see fit.
 
 ## Find a bug?
 
@@ -32,4 +32,4 @@ If you found an issue or would like to submit an improvement to this project, pl
 
 ## Known issues (Work in progress)
 
-There is currently no functionality in the bot(WIP)
+Motivational module currently only works when "!Motivate" is typed into chat
