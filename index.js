@@ -1,10 +1,14 @@
 /* eslint-disable indent */
 // Need these to read the folders and update events
+require('app-module-path').addPath(__dirname);
 const fs = require('node:fs');
 const path = require('node:path');
+// Sets the root of project for easier navigation
+global.appRoot = path.resolve(__dirname);
+
 
 // Require the necessary discord.js classes
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
 /*  Create a new client instance
@@ -18,13 +22,29 @@ const client = new Client({
         GatewayIntentBits.GuildMembers,
     ] });
 
+	client.commands = new Collection();
+	const commandsPath = path.join(__dirname, 'commands');
+
+	// Added this so I can sort the command folders by commands for better readability
+	const commandFiles = findAllFiles(commandsPath, '.js');
+
+	//  Collects all files and sets them to client commands
+	for (const file of commandFiles) {
+		const filePath = path.join(file.path, file.name);
+		const command = require(filePath);
+		if ('data' in command && 'execute' in command) {
+			client.commands.set(command.data.name, command);
+		}
+		else {
+			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+		}
+	}
 
 // Searches the event directory and loads all events into the bot
 const eventsPath = path.join(__dirname, 'events');
-const eventFiles = [];
 
 // Added this so I can sort the events folders by events for better readability
-findAllFiles(eventsPath, '.js');
+const eventFiles = findAllFiles(eventsPath, '.js');
 
 //  Collects all files and adds them to the client event listener
 for (const file of eventFiles) {
@@ -45,18 +65,20 @@ client.login(token);
 
 function findAllFiles(currentPath, fileExtensionFilter) {
 
+	const selectedFiles = [];
+
 	fs.readdirSync(currentPath, { withFileTypes: true }).forEach((item) => {
 
 		if (!item.isDirectory()) {
-			// If the file has the extension specified it gets added to eventFiles
-			if (item.name.endsWith(fileExtensionFilter)) eventFiles.push({ name: item.name, path: item.path });
-			return;
+			// If the file has the extension specified it gets added to selected Files
+			if (item.name.endsWith(fileExtensionFilter)) selectedFiles.push({ name: item.name, path: item.path });
 		}
 		else if (item.isDirectory()) {
 			// If file is a directory recursively call function
-			findAllFiles((item.path + '/' + item.name), fileExtensionFilter);
-			return;
+			const recurseArray = findAllFiles((item.path + '/' + item.name), fileExtensionFilter);
+			selectedFiles.push(...recurseArray);
 		}
-		return;
 	});
+
+	return selectedFiles;
 }
