@@ -26,6 +26,7 @@
     "@discordjs/builders": "^1.4.0",
     "app-module-path": "^2.2.0",
     "ascii-table3": "^0.8.0",
+    "better-sqlite3": "^9.2.2",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "easy-table": "^1.2.0",
