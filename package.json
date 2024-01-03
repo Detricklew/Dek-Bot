@@ -30,7 +30,6 @@
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "easy-table": "^1.2.0",
-    "sqlite3": "^5.1.4",
     "timestamp-conv": "^3.0.0"
   },
   "devDependencies": {
