@@ -41,6 +41,6 @@ If you found an issue or would like to submit an improvement to this project, pl
 
 ## Known issues (Work in progress)
 
-Motivational module currently only works when "!Motivate" is typed into chat.
-Roles in addResource is current not working.
-date to be removed  is currently not working in addResource is currently not working.
+- Motivational module currently only works when "!Motivate" is typed into chat.
+- Roles in addResource is currently not working.
+- date to be removed  is currently not working in addResource is currently not working.
