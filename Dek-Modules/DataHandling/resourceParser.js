@@ -5,7 +5,7 @@ function parser(resourceObject) {
 	const directory = DekDB.getDirectory(resourceObject.directory);
 	const check = true;
 	// checks to see if directory is in files
-	if (!directory.name) throw new Error('Directory does not exist');
+	if (!directory) throw new Error('Directory does not exist');
 	// checks to see if description is valid and not empty
 	if (resourceObject.description === undefined ||
 		resourceObject.description === '') throw new Error('Description is empty.');
