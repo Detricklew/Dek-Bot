@@ -1,3 +1,5 @@
 {
-	"token": "yourTokenGoesHere"
+	"token": "yourTokenGoesHere",
+	"clientId": "clientId goes here",
+	"DBname": "sample-database"
 }
