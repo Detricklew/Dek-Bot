@@ -4,7 +4,7 @@
 
 This project is a bot that will have a heavy focus on providing end users with enhanced productivity. Right now it is in it's infant stages. The features this bot will contain currently are the following :
 -
-- The ability to customize resources to be easily viewable to the end user
+- The ability to customize resources to be easily viewable to the end user(WIP)
 - The ability to send motivational quotes to users daily.(WIP)
 - Promodoro timer to help users with studying
 - Currency system
@@ -43,4 +43,4 @@ If you found an issue or would like to submit an improvement to this project, pl
 
 - Motivational module currently only works when "!Motivate" is typed into chat.
 - Roles in addResource is currently not working.
-- date to be removed  is currently not working in addResource is currently not working.
+- date to be removed  is currently not working in addResource.
