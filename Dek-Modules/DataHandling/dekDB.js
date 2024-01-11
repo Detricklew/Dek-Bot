@@ -116,6 +116,17 @@ class DekDB {
 		}
 	}
 
+	removeGuild(guild) {
+		const stmt = this.#db.prepare(`DELETE FROM guilds WHERE id = ?`);
+		
+		try{
+			stmt.run(guild.id);
+		}
+		catch (e) {
+			console.error(e);
+		}
+	}
+
 	// returns an array of all guilds if successful, an empty one if not 
 	getGuilds() {
 		
