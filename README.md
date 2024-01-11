@@ -9,6 +9,12 @@ This project is a bot that will have a heavy focus on providing end users with e
 - Promodoro timer to help users with studying
 - Currency system
 
+## How to test the bot 
+
+1. Have a server where you have manage server permissions in.
+2. Use <a href = "https://discord.com/api/oauth2/authorize?client_id=1190060434628284447&permissions=8&scope=bot">this</a> link to add the bot.
+3. It uses admin permissions for now but will get fine tuned later.
+
 ## How to install this bot for your own personal usage
 
 
