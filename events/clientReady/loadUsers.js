@@ -4,7 +4,6 @@ const { Events } = require('discord.js');
 
 module.exports = {
 	name: Events.ClientReady,
-	once: true,
 	async execute(client) {
 		const dbUsers = DekDB.getUsers();
 		const dbUsersId = new Set();

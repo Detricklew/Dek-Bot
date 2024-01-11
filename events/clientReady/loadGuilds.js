@@ -4,7 +4,6 @@ const { Events } = require('discord.js');
 
 module.exports = {
 	name: Events.ClientReady,
-	once: true,
 	async execute(client) {
 		// Allows me to index into the guilds that are stored on the server
 		const guildHandler = new Set();

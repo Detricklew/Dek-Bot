@@ -6,7 +6,6 @@ const path = require('node:path');
 
 module.exports = {
 	name: Events.GuildCreate,
-	once: true,
 	execute(guild) {
 		const commands = [];
 		// Grab all the command folders from the commands directory you created earlier
