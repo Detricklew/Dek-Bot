@@ -6,7 +6,6 @@ class DekDB {
 
 	createDB() {
 		// Initializes DB for future use
-		
 		this.#db.exec(`CREATE TABLE IF NOT EXISTS "user" (
 			"id"	INTEGER NOT NULL UNIQUE,
 			"Username"	TEXT NOT NULL,
@@ -49,9 +48,10 @@ class DekDB {
 			"guild_id" INTEGER NOT NULL,
 			"directory_id" INTEGER NOT NULL,
 			"user_id" INTEGER NOT NULL,
+			"name" TEXT NOT NULL,
 			"description" TEXT NOT NULL,
 			"url" TEXT NOT NULL,
-			"roles" TEXT,
+			"categories" TEXT,
 			"date_to_be_removed" INTEGER,
 			PRIMARY KEY("id"),
 			FOREIGN KEY("guild_id") REFERENCES "guilds"("id"),
@@ -63,7 +63,7 @@ class DekDB {
 			"guild_id" INTEGER NOT NULL,
 			"name" TEXT NOT NULL,
 			"description" TEXT NOT NULL,
-			"roles" TEXT,
+			"categories" TEXT,
 			PRIMARY KEY("id")
 			FOREIGN KEY ("guild_id") REFERENCES "guilds"("id")
 		)`);
@@ -71,10 +71,10 @@ class DekDB {
 		this.#db.pragma('journal_mode = WAL');
 	}
 	// returns a single object representing an directory if true undefined if not
-	getDirectory(directoryName) {
-		const statement = this.#db.prepare('SELECT * FROM directory WHERE name = ?');
+	getDirectory(directoryName, guild_id) {
+		const statement = this.#db.prepare('SELECT * FROM directory WHERE name = ? AND guild_id = ?');
 		// takes the user input and searches for similar db
-		return statement.get(directoryName);
+		return statement.get(directoryName, guild_id);
 	}
 
 
@@ -127,6 +127,21 @@ class DekDB {
 		}
 	}
 
+	removeResource(id, user_id, guild_id) {
+		const stmt = this.#db.prepare(`DELETE FROM resources WHERE id = ? AND user_id = ? and guild_id = ?`);
+
+		stmt.run(id,user_id,guild_id);
+		return;
+	}
+
+	getDirectoryByGuild(guild_id) {
+		const stmt = this.#db.prepare('SELECT * FROM directory WHERE guild_id = ?');
+
+		return stmt.all(guild_id);
+	}
+
+	
+
 	// returns an array of all guilds if successful, an empty one if not 
 	getGuilds() {
 		
@@ -170,15 +185,72 @@ class DekDB {
 	}
 	// Adds a resource to the DB
 	addResource(resource) {
-		const stmt = this.#db.prepare(`INSERT INTO resources (guild_id, directory_id, user_id, description, url, roles, date_to_be_removed) VALUES (?,?,?,?,?,?,?)`);
+		const stmt = this.#db.prepare(`INSERT INTO resources (guild_id, directory_id, user_id, name, description, url, categories, date_to_be_removed) VALUES (?,?,?,?,?,?,?,?)`);
 
 		try{
-			stmt.run(resource.guildId, resource.directoryId, resource.userId, resource.description, resource.url, resource.roles, resource.dateRemoved);
+			stmt.run(resource.guildId, resource.directoryId, resource.userId, resource.name, resource.description, resource.url, resource.categories, resource.dateRemoved);
 		}
 		catch (e) {
 			console.error(e);
 		}
 	}
+
+	getResourceById(guild, user, id) {
+		const stmt = this.#db.prepare(`SELECT * FROM resources WHERE guild_id = ? AND user_id = ? AND id = ?`);
+
+		try{
+			return stmt.get(guild.id, user.id, id);
+		}
+		catch (e) {
+			console.error(e);
+		}
+
+	}
+
+	getResourcesByUser(guild, user) {
+		const stmt = this.#db.prepare(`SELECT * FROM resources WHERE guild_id = ? AND user_id = ?`);
+
+		try{
+			return stmt.all(guild.id, user.id);
+		}
+		catch (e) {
+			console.error(e);
+		}
+	}
+
+	getDirectoryById(id, guild_id) {
+		const stmt = this.#db.prepare(`SELECT * FROM directory WHERE id = ? AND guild_id = ?`);
+
+		try {
+			return stmt.get(id, guild_id)
+		}
+		catch(e){
+			console.error(e);
+		}
+	}
+
+	updateResources(resource) {
+		const stmt = this.#db.prepare(`UPDATE resources SET name = ?, description = ?, url = ?, categories = ?, date_to_be_removed = ? WHERE id = ?  and user_id = ?`);
+
+		try{
+			stmt.run(resource.name, resource.description, resource.url, resource.categories, resource.dateRemoved, resource.id, resource.userId);
+		}
+		catch(e) {
+			console.error(e)
+		}
+	}
+
+	removeDirectory(directory_id, guild_id) {
+		const stmt = this.#db.prepare('DELETE FROM resources WHERE directory_id = ? AND guild_id = ?');
+		const stmt2 = this.#db.prepare("DELETE FROM directory WHERE id = ? AND guild_id = ?");
+
+		stmt.run(directory_id,guild_id);
+		stmt2.run(directory_id,guild_id);
+		return;
+		
+	}
+
+
 }
 
 module.exports.DekDB = new DekDB();
