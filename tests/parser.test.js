@@ -9,11 +9,11 @@ test('validates object with all valid properties', () => {
 		directory: 'dir1',
 		description: 'A valid description',
 		url: 'https://www.example.com',
-		roles: ['role1', 'role2'],
+		roles: 'role1,role2',
 		dateRemoved: '01/01/2023',
 	};
 
-	DekDB.getDirectory.mockReturnValue({ name: 'dir1', roles: 'role1 role2' });
+	DekDB.getDirectory.mockReturnValue({ name: 'dir1', roles: 'role1,role2' });
 
 	expect(parser(validObject)).toBe(true);
 });
@@ -63,13 +63,13 @@ test('fails validation for object with invalid roles', () => {
 		directory: 'dir1',
 		description: 'A valid description',
 		url: 'https://www.example.com',
-		roles: ['role1', 123],
+		categories: 'role1,123',
 		dateRemoved: '01/01/2023',
 	};
 
-	DekDB.getDirectory.mockReturnValue({ name: 'dir1', roles: 'role1 role2' });
+	DekDB.getDirectory.mockReturnValue({ name: 'dir1', categories: 'role1,role2' });
 
-	expect(() => parser(invalidRolesObject)).toThrow(new Error('Roles are invalid/does not exist in this directory'));
+	expect(() => parser(invalidRolesObject)).toThrow(new Error('Categories are invalid/does not exist in this directory'));
 });
 
 test('validates object without dateRemoved property', () => {

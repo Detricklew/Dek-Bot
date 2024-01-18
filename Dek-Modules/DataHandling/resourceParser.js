@@ -9,7 +9,7 @@ function parser(resourceObject) {
 	// checks to see if description is valid and not empty
 	if (resourceObject.description === undefined ||
 		resourceObject.description === '') throw new Error('Description is empty.');
-	// makes sure url is a valid one
+	// makes sure url is a valid one 
 	try {
 		new URL(resourceObject.url);
 	}
@@ -19,12 +19,12 @@ function parser(resourceObject) {
 
 	// if there are any roles submitted
 	if (resourceObject.categories) {
-		if(directory.categories) throw new Error('Categories are invalid/does not exist in this directory');
-		const categories = directory.categories.split(',');
+		if (directory.categories) throw new Error('Categories are invalid/does not exist in this directory');
+		resourceObject.categories = resourceObject.categories.split(',');
 		directory.categories = directory.categories.split(',');
 		resourceObject.categories.forEach((category) => {
 			// if roles isn't in database fail test
-			if (categories.indexOf(category) == -1) throw new Error('Categories are invalid/does not exist in this directory');
+			if (directory.categories.indexOf(category) == -1) throw new Error('Categories are invalid/does not exist in this directory');
 		});
 	}
 
