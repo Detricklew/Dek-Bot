@@ -36,7 +36,7 @@ test('fails validation for object with an empty description', () => {
 		description: '',
 		url: 'https://www.example.com',
 		roles: ['role1', 'role2'],
-		dateRemoved: '01/01/2023',
+		dateRemoved: '01/31/2023',
 	};
 
 	DekDB.getDirectory.mockReturnValue({ name: 'dir1', roles: 'role1 role2' });
