@@ -7,16 +7,17 @@ module.exports = {
 		.setName('listdirectories')
 		.setDescription('List all directories you own'),
 	async execute(interaction) {
-        const directories = DekDB.getDirectoryByGuild(interaction.guildId);
-        if(!directories) {
-            interaction.reply({ content: 'No directories in this guild', emphemeral: true });
-            return;
-        }
-        let listOfdirectories = 'id   name\n';
-        directories.forEach((directory) =>{
-            listOfdirectories += `${directory.id}  ${directory.name}\n`;
-        })
+		// Makes a pull to grab all directories tied to guild
+		const directories = DekDB.getDirectoryByGuild(interaction.guildId);
+		if (!directories) {
+			interaction.reply({ content: 'No directories in this guild', emphemeral: true });
+			return;
+		}
+		let listOfDirectories = 'id   name\n';
+		directories.forEach((directory) => {
+			listOfDirectories += `${directory.id}  ${directory.name}\n`;
+		}),
 
-        interaction.reply({ content: listOfdirectories, emphemeral: true });
+		interaction.reply({ content: listOfDirectories, emphemeral: true });
 	},
 };

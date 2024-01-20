@@ -115,7 +115,7 @@ class DekDB {
 			console.error(e);
 		}
 	}
-
+	// removes guild from directory
 	removeGuild(guild) {
 		const stmt = this.#db.prepare(`DELETE FROM guilds WHERE id = ?`);
 		
@@ -126,21 +126,19 @@ class DekDB {
 			console.error(e);
 		}
 	}
-
+	// Attempts to remove resource
 	removeResource(id, user_id, guild_id) {
 		const stmt = this.#db.prepare(`DELETE FROM resources WHERE id = ? AND user_id = ? and guild_id = ?`);
 
 		stmt.run(id,user_id,guild_id);
 		return;
 	}
-
+	// Gets directory by guild id
 	getDirectoryByGuild(guild_id) {
 		const stmt = this.#db.prepare('SELECT * FROM directory WHERE guild_id = ?');
 
 		return stmt.all(guild_id);
 	}
-
-	
 
 	// returns an array of all guilds if successful, an empty one if not 
 	getGuilds() {
@@ -194,7 +192,7 @@ class DekDB {
 			console.error(e);
 		}
 	}
-
+	// Gets resource by guild user and id
 	getResourceById(guild, user, id) {
 		const stmt = this.#db.prepare(`SELECT * FROM resources WHERE guild_id = ? AND user_id = ? AND id = ?`);
 
@@ -206,7 +204,7 @@ class DekDB {
 		}
 
 	}
-
+	// Gets a list of resources by user id
 	getResourcesByUser(guild, user) {
 		const stmt = this.#db.prepare(`SELECT * FROM resources WHERE guild_id = ? AND user_id = ?`);
 
@@ -217,7 +215,7 @@ class DekDB {
 			console.error(e);
 		}
 	}
-
+	// Gets resources by id
 	getDirectoryById(id, guild_id) {
 		const stmt = this.#db.prepare(`SELECT * FROM directory WHERE id = ? AND guild_id = ?`);
 
@@ -228,7 +226,7 @@ class DekDB {
 			console.error(e);
 		}
 	}
-
+	// Updates resources
 	updateResources(resource) {
 		const stmt = this.#db.prepare(`UPDATE resources SET name = ?, description = ?, url = ?, categories = ?, date_to_be_removed = ? WHERE id = ?  and user_id = ?`);
 
@@ -239,7 +237,7 @@ class DekDB {
 			console.error(e)
 		}
 	}
-
+	// removes directory
 	removeDirectory(directory_id, guild_id) {
 		const stmt = this.#db.prepare('DELETE FROM resources WHERE directory_id = ? AND guild_id = ?');
 		const stmt2 = this.#db.prepare("DELETE FROM directory WHERE id = ? AND guild_id = ?");

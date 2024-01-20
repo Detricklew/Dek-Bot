@@ -1,5 +1,6 @@
 const { Events } = require('discord.js');
 const { DekDB } = require('../../Dek-Modules/DataHandling/dekDB');
+const { dateParser } = require('../../Dek-Modules/DataHandling/dateParser');
 const parser = require('../../Dek-Modules/DataHandling/resourceParser');
 
 module.exports = {
@@ -18,7 +19,7 @@ module.exports = {
 				submission.userId = interaction.user.id;
 				const dateRemoved = interaction.fields.getTextInputValue('dateRemoved');
 				submission.roles = null;
-				submission.dateRemoved = dateRemoved ? dateRemoved : null;
+				submission.dateRemoved = dateRemoved ? dateParser(dateRemoved) : null;
 				try {
 					parser(submission);
 					const directory = DekDB.getDirectory(submission.directory, interaction.guildId);

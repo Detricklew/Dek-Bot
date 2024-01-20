@@ -9,7 +9,7 @@ function parser(resourceObject) {
 	// checks to see if description is valid and not empty
 	if (resourceObject.description === undefined ||
 		resourceObject.description === '') throw new Error('Description is empty.');
-	// makes sure url is a valid one 
+	// makes sure url is a valid one
 	try {
 		new URL(resourceObject.url);
 	}

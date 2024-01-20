@@ -8,11 +8,12 @@ module.exports = {
 	name: Events.GuildCreate,
 	execute(guild) {
 		const commands = [];
-		// Grab all the command folders from the commands directory you created earlier
+		// Sets path to commands folder
 		const commandsPath = path.join(__dirname, '..', '..', 'commands');
+		// Reads through the commands folder and selects only files that end in js
 		const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 
-
+		// Goes through each entry in command files array and adds it to a json to send to discord API
 		for (const file of commandFiles) {
 			const filePath = path.join(commandsPath, file);
 			const command = require(filePath);
@@ -29,8 +30,8 @@ module.exports = {
 
 		(async () => {
 			try {
+				// Loads all commands into newly added guild
 				console.log(`Started refreshing ${commands.length} application (/) commands in ${guild.name}.`);
-				// The put method is used to fully refresh all commands in the guild with the current set
 				const data = await rest.put(
 					Routes.applicationGuildCommands(clientId, guild.id),
 					{ body: commands },
@@ -39,7 +40,6 @@ module.exports = {
 				console.log(`Successfully reloaded ${data.length} application (/) commands in ${guild.name}.`);
 			}
 			catch (error) {
-				// And of course, make sure you catch and log any errors!
 				console.error(error);
 			}
 		})();
