@@ -1,0 +1,28 @@
+
+<div
+	class="fixed top-0 left-0 min-h-screen w-16 z-20 m-0 mb-4 flex flex-col gap-4 bg-gray-900 text-white shadow-lg" hx-boost="true"
+>
+  <a href="/Dashboard">
+  <i
+  class="relative flex items-center justify-center h-12 w-12 mx-auto mt-[3.8rem] rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+    ><img src="https://cdn.discordapp.com/avatars/<%= user.id %>/<%= user.avatar %>.png?size=1024" alt="Profile Picture" class="h-12 w-12 rounded-[50%] hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab"><span
+      class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100"
+      ><%= user.username %></span
+    ></i
+  ></a>
+  <div class="w-full bg-gray-800 h-[3px] scale-75 rounded-[1px]"></div>
+  <% guilds.forEach((guild) => {%>
+  <a hx-get="/Server/<%= guild.id %>" hx-target="#container">
+  <i class="relative flex items-center justify-center h-12 w-12 mx-auto rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group">
+	
+	<% if (guild.icon) { %>
+		<img src="https://cdn.discordapp.com/icons/<%= guild.id %>/<%= guild.icon %>.jpg" alt="Profile Picture" class="h-12 w-12 rounded-[50%] hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab">
+	<% } else {%>
+		<%= guild.name.charAt(0) + 's' %>
+	<% } %>
+	
+	<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100"><%= guild.name %></span>
+</i>
+</a>
+  <% }); %>
+</div>

@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Discord/ HTMX</title>
+  </head>
+  <script
+    src="https://unpkg.com/htmx.org@1.9.10"
+    integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+    crossorigin="anonymous"
+  ></script>
+  <link href="../src/output.css" rel="stylesheet" />
+  <body class="h-full bg-slate-600">
+	<header class="z-[9] p-5 flex bg-gray-900 h-[3.8em] fixed w-full right-0 left-0 top-0">
+
+	</header>
+		<div
+      class="fixed top-0 left-0 min-h-screen w-16 z-20 m-0 mb-4 flex flex-col gap-4 bg-gray-900 text-white shadow-lg"
+    >
+      <i class="relative flex items-center justify-center h-12 w-12 mx-auto mt-[3.8rem] rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+        >A<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100">tooltip</span></i
+      >
+      <div class="w-full bg-gray-800 h-[3px] scale-75 rounded-[1px]"></div>
+      <i
+        class="relative flex items-center justify-center h-12 w-12 mx-auto rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+        >B<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100">tooltip</span></i
+      >
+      <i
+        class="relative flex items-center justify-center h-12 w-12 mx-auto rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+        >C<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100">tooltip</span></i
+      >
+      <i
+        class="relative flex items-center justify-center h-12 w-12 mx-auto rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+        >D<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100">tooltip</span></i
+      >
+      <i
+        class="relative flex items-center justify-center h-12 w-12 mx-auto rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+        >E<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100">tooltip</span></i
+      >
+      <i
+        class="relative flex items-center justify-center h-12 w-12 mx-auto rounded-[50%] bg-gray-800 text-green-500 hover:bg-green-600 hover:text-white hover:rounded-[36%] transition-all duration-100 ease-linear cursor-grab before:w-full before:h-full before:bg-white before:absolute before:rounded-[5px] before:top-1/2 before:translate-x-[-100%] before:translate-y-[-50%] before:scale-50 before:scale-x-75 before:scale-y-50 group"
+        >F<span class="absolute w-auto p-2 m-2 min-w-max left-14 rounded-md shadow-md text-white bg-gray-900 text-xs lg:text-sm font-bold transition-all duration-100 scale-0 origin-left group-hover:scale-100">tooltip</span></i
+      >
+    </div>
+	<div class="">
+		<div class="scale-0 h-full fixed top-0 left-0 w-[280px] z-[1] bg-slate-900"></div>
+		<div class=" scale-0 h-full fixed top-0 left-0 w-[280px] z-10 bg-slate-700 flex flex-col items-center rounded-3xl ml-16 mt-[3.8rem]">
+			<div class="mt-8 flex flex-col gap-3">
+				<img src="" class="h-24 w-24 bg-white rounded-full">
+				<p class="text-center text-white font-semibold">username</p>
+			</div>
+			<div class="flex flex-col">
+				<div class="flex flex-col">
+					<div class="flex mt-4 mx-4 mb-0">
+						<img src="../images/icons/chevron-right.png" alt="icon down" class="h-6 w-6 rotate-90">
+						<h3 class="text-left w-64 text-gray-800 hover:text-white transition-all duration-100 ease-linear">productivity</h3>
+					</div>
+					<div>
+						<div class="flex ml-6 p-3 ">
+							<p>🔑</p>
+							<h3 class="text-left ml-1">Resources</h3>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class=" ml-72 flex items-center justify-center w-auto ms-[8.8rem] pt-14">
+			<div class="mt-48 text-center flex flex-col gap-3">
+				<h3>Start your productivity journey!</h3>
+				<div>
+					<button class="p-4 bg-blue-700 rounded-lg shadow-lg border-x-2 border-y-2 border-gray-800 hover:bg-blue-600">add to discord</button>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+
+  </body>
+</html>
